@@ -23,6 +23,20 @@ except ImportError:
 
 from src.event_bus import event_bus, Event, EventType, Severity
 
+_PROTO_NAMES = {
+    1: "ICMP",
+    2: "IGMP",
+    6: "TCP",
+    17: "UDP",
+    41: "IPv6",
+    47: "GRE",
+    50: "ESP",
+    51: "AH",
+    58: "ICMPv6",
+    89: "OSPF",
+    132: "SCTP",
+}
+
 
 class ParsedPacket:
     """Structured representation of a captured packet."""
@@ -256,7 +270,7 @@ class PacketEngine:
             pkt.protocol = "ICMP"
 
         else:
-            pkt.protocol = str(ip_layer.proto)
+            pkt.protocol = _PROTO_NAMES.get(ip_layer.proto, str(ip_layer.proto))
 
         # DNS query extraction
         if raw_pkt.haslayer(DNS) and raw_pkt[DNS].qr == 0:  # Query

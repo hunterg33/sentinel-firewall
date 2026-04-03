@@ -1,0 +1,140 @@
+# ============================================================
+# Sentinel Firewall — Configuration
+# ============================================================
+
+general:
+  log_level: INFO          # DEBUG | INFO | WARNING | ERROR
+  log_file: logs/sentinel.log
+  data_dir: data
+
+dns_filter:
+  enabled: true
+  listen_address: 127.0.0.1
+  listen_port: 5354         # Local DNS proxy port
+  upstream_dns: 8.8.8.8     # Upstream resolver
+  upstream_port: 53
+  cache_ttl: 300             # DNS cache TTL in seconds
+  blocklists:
+    - name: StevenBlack Unified
+      url: https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+      enabled: true
+    - name: Energized Basic
+      url: https://block.energized.pro/basic/formats/hosts.txt
+      enabled: true
+  custom_blocked_domains:
+    - telemetry.example.com
+    - tracking.example.com
+  whitelist:
+    - localhost
+    - local
+    - _tcp.local
+    - _udp.local
+
+ids:
+  enabled: true
+  interface: null            # null = auto-detect default interface
+  capture_filter: "ip"       # BPF filter for packet capture
+  max_packet_size: 65535
+  alert_threshold: 10        # alerts per minute before escalation
+  rules:
+    # Port scan detection
+    - name: Port Scan Detection
+      type: port_scan
+      enabled: true
+      threshold: 15          # connections to distinct ports within window
+      window_seconds: 60
+
+    # SYN flood detection
+    - name: SYN Flood Detection
+      type: syn_flood
+      enabled: true
+      threshold: 100         # SYN packets per second
+      window_seconds: 10
+
+    # DNS tunneling detection
+    - name: DNS Tunneling Detection
+      type: dns_tunnel
+      enabled: true
+      query_length_threshold: 50   # unusually long DNS queries
+      frequency_threshold: 60      # queries per minute to same domain
+
+    # Known bad signatures (simplified Snort-like)
+    - name: SSH Brute Force
+      type: signature
+      enabled: true
+      protocol: tcp
+      dst_port: 22
+      threshold: 10
+      window_seconds: 60
+      description: Multiple SSH connection attempts
+
+    - name: Suspicious HTTP User-Agent
+      type: payload_match
+      enabled: true
+      protocol: tcp
+      pattern: "(?i)(nikto|sqlmap|nmap|masscan|zgrab)"
+      description: Known scanning tool user-agent detected
+
+    # ARP spoofing detection
+    - name: ARP Spoofing Detection
+      type: arp_spoof
+      enabled: true
+      description: Detects ARP cache poisoning attempts
+
+    # Large outbound data transfer
+    - name: Data Exfiltration Alert
+      type: data_exfil
+      enabled: true
+      threshold_mb: 100      # MB transferred in window
+      window_seconds: 300    # 5-minute window
+      description: Unusually large outbound data transfer
+
+# ── Threat Intelligence ──
+threat_intel:
+  enabled: true
+  update_interval: 3600        # seconds between feed refreshes
+  api_keys:
+    abuseipdb: ""              # Free key from abuseipdb.com/account/api
+    otx: ""                    # Free key from otx.alienvault.com
+  custom_feeds: []             # Additional feeds (same format as builtins)
+
+# ── Suricata Rules ──
+suricata:
+  enabled: true
+  variables:
+    HOME_NET: "192.168.0.0/16,10.0.0.0/8,172.16.0.0/12"
+    EXTERNAL_NET: "any"
+    HTTP_PORTS: "80,8080,443"
+    SSH_PORTS: "22"
+  rule_files: []               # Local .rules files to load
+  rule_urls:
+    - name: ET Open Emerging Threats
+      url: https://rules.emergingthreats.net/open/suricata-7.0/rules/emerging-malware.rules
+      enabled: true
+    - name: ET Open Scan Rules
+      url: https://rules.emergingthreats.net/open/suricata-7.0/rules/emerging-scan.rules
+      enabled: true
+    - name: ET Open Exploit Rules
+      url: https://rules.emergingthreats.net/open/suricata-7.0/rules/emerging-exploit.rules
+      enabled: false            # Enable for broader coverage
+
+# ── Application Control (WFP) ──
+app_control:
+  enabled: true
+  default_expiry_minutes: 60   # Block rules auto-expire (0 = no expiry)
+  blocked_apps: []             # Pre-configured blocked apps
+    # Example:
+    # - path: C:\Path\To\app.exe
+    #   direction: outbound
+    #   description: Block telemetry
+
+dashboard:
+  enabled: true
+  host: 127.0.0.1
+  port: 8080
+  update_interval: 1           # seconds between WebSocket pushes
+  max_events: 10000            # max events to keep in memory
+  auth:
+    enabled: true              # KEEP THIS ENABLED — disabling exposes /api/apps/panic
+    username: admin
+    password: ""        # CHANGE THIS before first run!
