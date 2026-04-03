@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+data/*.txt
+logs/*.log
+.idea/
+.vscode/
+*.egg-info/
+dist/
+build/
+config/default_config.yaml
+data/
+logs/

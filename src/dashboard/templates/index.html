@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel Firewall — Dashboard</title>
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <svg class="logo" viewBox="0 0 32 32" width="28" height="28" fill="none" aria-label="Sentinel">
+                <path d="M16 2L4 8v8c0 7.7 5.1 14.9 12 16.8C22.9 30.9 28 23.7 28 16V8L16 2z" stroke="currentColor" stroke-width="2" fill="none"/>
+                <path d="M16 8l-6 3.5v5c0 4.2 2.5 8 6 9.2 3.5-1.2 6-5 6-9.2v-5L16 8z" fill="currentColor" opacity="0.2"/>
+                <circle cx="16" cy="17" r="3" fill="currentColor"/>
+            </svg>
+            <h1>Sentinel</h1>
+            <span class="badge badge-success" id="status-badge">Active</span>
+        </div>
+        <div class="header-right">
+            <span class="uptime" id="uptime">Uptime: --</span>
+        </div>
+    </header>
+
+    <!-- KPI Cards -->
+    <section class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">Packets Analyzed</div>
+            <div class="kpi-value" id="kpi-packets">0</div>
+            <div class="kpi-sub" id="kpi-pps">0 pkt/s</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Bandwidth</div>
+            <div class="kpi-value" id="kpi-bandwidth">0 B/s</div>
+            <div class="kpi-sub" id="kpi-total-bytes">0 total</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">DNS Blocked</div>
+            <div class="kpi-value" id="kpi-dns-blocked">0</div>
+            <div class="kpi-sub" id="kpi-dns-total">of 0 queries</div>
+        </div>
+        <div class="kpi-card kpi-card-alert">
+            <div class="kpi-label">IDS Alerts</div>
+            <div class="kpi-value" id="kpi-alerts">0</div>
+            <div class="kpi-sub" id="kpi-rules">0 active rules</div>
+        </div>
+    </section>
+
+    <!-- Main Grid -->
+    <main class="main-grid">
+        <!-- Bandwidth Chart -->
+        <section class="panel panel-wide">
+            <div class="panel-header">
+                <h2>Network Traffic</h2>
+                <span class="panel-badge" id="protocol-summary"></span>
+            </div>
+            <div class="chart-container">
+                <canvas id="bandwidth-chart"></canvas>
+            </div>
+        </section>
+
+        <!-- IDS Alerts -->
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Intrusion Alerts</h2>
+                <span class="panel-badge badge-alert" id="alert-count">0</span>
+            </div>
+            <div class="event-list" id="alerts-list">
+                <div class="empty-state">No alerts detected — monitoring active</div>
+            </div>
+        </section>
+
+        <!-- DNS Activity -->
+        <section class="panel">
+            <div class="panel-header">
+                <h2>DNS Activity</h2>
+                <span class="panel-badge" id="dns-count">0 queries</span>
+            </div>
+            <div class="event-list" id="dns-list">
+                <div class="empty-state">Waiting for DNS queries...</div>
+            </div>
+        </section>
+
+        <!-- Top Talkers -->
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Top Connections</h2>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="top-talkers-table">
+                    <thead>
+                        <tr>
+                            <th>IP Address</th>
+                            <th>Packets</th>
+                            <th>Bar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top-talkers-body">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Protocol Distribution -->
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Protocols</h2>
+            </div>
+            <div class="chart-container chart-small">
+                <canvas id="protocol-chart"></canvas>
+            </div>
+        </section>
+
+        <!-- Blocklist Stats -->
+        <section class="panel">
+            <div class="panel-header">
+                <h2>DNS Blocklist</h2>
+            </div>
+            <div class="blocklist-stats">
+                <div class="stat-row">
+                    <span class="stat-label">Domains Blocked</span>
+                    <span class="stat-value" id="bl-domains">—</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Blocklists Loaded</span>
+                    <span class="stat-value" id="bl-lists">—</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Custom Rules</span>
+                    <span class="stat-value" id="bl-custom">—</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Whitelisted</span>
+                    <span class="stat-value" id="bl-whitelist">—</span>
+                </div>
+            </div>
+            <!-- Manual block/unblock -->
+            <div class="domain-control">
+                <input type="text" id="domain-input" placeholder="Enter domain..." class="input-field">
+                <button class="btn btn-danger" onclick="blockDomain()">Block</button>
+                <button class="btn btn-muted" onclick="unblockDomain()">Allow</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

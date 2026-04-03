@@ -1,0 +1,358 @@
+/* ============================================================
+   Sentinel Firewall Dashboard — Styles
+   Dark-first cybersecurity dashboard
+   ============================================================ */
+
+:root {
+    --bg: #0f1117;
+    --bg-surface: #161821;
+    --bg-surface-alt: #1c1e2a;
+    --bg-hover: #22253a;
+    --border: #2a2d3e;
+    --border-subtle: #1f2233;
+    --text: #e1e2e8;
+    --text-muted: #8b8ea0;
+    --text-faint: #5a5d72;
+    --primary: #4f98a3;
+    --primary-dim: rgba(79, 152, 163, 0.15);
+    --success: #6daa45;
+    --success-dim: rgba(109, 170, 69, 0.15);
+    --warning: #e8af34;
+    --warning-dim: rgba(232, 175, 52, 0.12);
+    --danger: #dd6974;
+    --danger-dim: rgba(221, 105, 116, 0.12);
+    --critical: #ff4d6a;
+    --critical-dim: rgba(255, 77, 106, 0.1);
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+    --radius: 8px;
+    --radius-sm: 4px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 0 20px 40px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-left h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.logo { color: var(--primary); }
+
+.header-right { color: var(--text-muted); font-size: 0.85rem; }
+
+.uptime { font-family: var(--font-mono); font-size: 0.8rem; }
+
+/* Badges */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge-success { background: var(--success-dim); color: var(--success); }
+.badge-alert { background: var(--danger-dim); color: var(--danger); }
+.badge-warning { background: var(--warning-dim); color: var(--warning); }
+
+/* KPI Grid */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.kpi-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    transition: border-color 0.2s;
+}
+
+.kpi-card:hover { border-color: var(--primary); }
+
+.kpi-card-alert .kpi-value { color: var(--danger); }
+
+.kpi-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.kpi-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1.2;
+}
+
+.kpi-sub {
+    font-size: 0.75rem;
+    color: var(--text-faint);
+    margin-top: 2px;
+    font-family: var(--font-mono);
+}
+
+/* Main Grid */
+.main-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+/* Panels */
+.panel {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    min-height: 240px;
+    overflow: hidden;
+}
+
+.panel-wide { grid-column: span 3; }
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.panel-header h2 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
+}
+
+.panel-badge {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+/* Charts */
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 220px;
+}
+
+.chart-small { height: 180px; }
+
+/* Event Lists */
+.event-list {
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.event-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 0.8rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.event-time {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    white-space: nowrap;
+    min-width: 60px;
+}
+
+.event-severity {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+}
+
+.event-severity.info { background: var(--primary); }
+.event-severity.low { background: var(--success); }
+.event-severity.medium { background: var(--warning); }
+.event-severity.high { background: var(--danger); }
+.event-severity.critical { background: var(--critical); box-shadow: 0 0 6px var(--critical); }
+
+.event-message {
+    flex: 1;
+    color: var(--text-muted);
+    word-break: break-all;
+}
+
+.event-message strong { color: var(--text); font-weight: 500; }
+
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+    color: var(--text-faint);
+    font-size: 0.8rem;
+}
+
+/* Data Table */
+.table-container { overflow-x: auto; }
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.data-table th {
+    text-align: left;
+    color: var(--text-faint);
+    font-weight: 500;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.data-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border-subtle);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.bar-cell {
+    width: 40%;
+}
+
+.bar-fill {
+    height: 4px;
+    background: var(--primary);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+/* Blocklist Stats */
+.blocklist-stats { margin-bottom: 14px; }
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 0.8rem;
+}
+
+.stat-label { color: var(--text-muted); }
+.stat-value { color: var(--text); font-family: var(--font-mono); font-weight: 500; }
+
+/* Domain Control */
+.domain-control {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.input-field {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 6px 10px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.input-field:focus { border-color: var(--primary); }
+.input-field::placeholder { color: var(--text-faint); }
+
+.btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: opacity 0.2s;
+}
+
+.btn:hover { opacity: 0.85; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-muted { background: var(--bg-hover); color: var(--text-muted); }
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .main-grid { grid-template-columns: 1fr; }
+    .panel-wide { grid-column: span 1; }
+}
+
+@media (max-width: 600px) {
+    .kpi-grid { grid-template-columns: 1fr; }
+    body { padding: 0 12px 30px; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
