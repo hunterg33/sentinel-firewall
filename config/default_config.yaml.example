@@ -102,7 +102,7 @@ threat_intel:
 suricata:
   enabled: true
   variables:
-    HOME_NET: "192.168.0.0/16,10.0.0.0/8,172.16.0.0/12"
+    HOME_NET: "192.168.0.0/16"   # Replace with your actual subnet
     EXTERNAL_NET: "any"
     HTTP_PORTS: "80,8080,443"
     SSH_PORTS: "22"
