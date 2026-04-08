@@ -160,7 +160,7 @@ threat_intel:
 suricata:
   enabled: true
   variables:
-    HOME_NET: "192.168.1.0/24"
+    HOME_NET: "192.168.0.0/16"   # Replace with your actual subnet
     EXTERNAL_NET: "any"
   rule_files:
     - /path/to/custom.rules
